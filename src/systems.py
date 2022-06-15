@@ -5,7 +5,6 @@ def zigzag(params:dict)->kwant.system.FiniteSystem:
 
     Args:
         params (dict): A dictionary of parameters for the zigzag ribbon. This contains:
-        a, t, mu, mul, Nx, Ny, Nimp, V, dis, leads, pbc
         a, t, mu, mul, L, W, Nimp, V, dis, leads
 
     Returns:
