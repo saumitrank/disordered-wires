@@ -2,3 +2,4 @@
 .vscode/settings.json
 src/__pycache__/systems.cpython-38.pyc
 src/test_notebook.ipynb
+*.pyc

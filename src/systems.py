@@ -1,11 +1,59 @@
 import kwant
+import numpy as np
+
+def add_disorder(sys:kwant.builder.Builder, lat, Nimp:float=1.0, V:float=0.0, dis:int=0)->kwant.system.FiniteSystem:
+    """Add on-site or NN hopping disorder to a system
+
+    Args:
+        sys (kwant.builder.Builder): _description_
+        lat (_type_): _description_
+        Nimp (float, optional): _description_. Defaults to 1.0.
+        V (float, optional): _description_. Defaults to 0.0.
+        dis (int, optional): _description_. Defaults to 0.
+
+    Returns:
+        kwant.system.FiniteSystem: _description_
+    """
+    #Get number of orbitals
+    norbs = list(sys.sites())[0].family.norbs
+    m = np.identity(norbs)
+    
+    #On-site disorder
+    if (dis == 0):
+        for site in sys.sites():
+            if (np.random.random() <= Nimp):
+                Vx = 2*V*np.random.random() - V
+                sys[site] = sys[site] + Vx*m
+
+    #NN Hopping disorder
+    elif (dis == 1):
+        for hopping_kind in lat.neighbors():
+            pairs = hopping_kind(sys)
+            for hop in pairs:
+                if (np.random.random() <= Nimp):
+                    Vx = 2*V*np.random.random() - V
+                    sys[hop] = sys[hop] + Vx*m #Builder automatically takes care of hermitian conjugate
+    
+    return sys
+
+
 
 def zigzag(params:dict)->kwant.system.FiniteSystem:
     """Create a zigzag ribbon with no spin and only NN hopping
 
     Args:
-        params (dict): A dictionary of parameters for the zigzag ribbon. This contains:
-        a, t, mu, mul, L, W, Nimp, V, dis, leads
+        params (dict): A dictionary of parameters for the zigzag ribbon. 
+        This contains:
+        a (float): Lattice constant 
+        t (float): NN hopping
+        mu (float): Chemical potential in scattering region
+        mul (float): Additional potential in leads
+        L (int): Length
+        W (int): Number of horizontal chains
+        Nimp (float): Probability of bond/site having disorder (from 0 to 1)
+        V (float): Strength of disorder chosen from uniform dsbn in [-V, V]
+        dis (0, 1): Disorder type. 0 for on-site, 1 for hopping
+        leads (bool): Whether or not there should be leads
 
     Returns:
         kwant.system.FiniteSystem: Zigzag graphene ribbon with/without leads attached
@@ -46,7 +94,7 @@ def zigzag(params:dict)->kwant.system.FiniteSystem:
         sys.eradicate_dangling()
         
     #Add disorder
-    # sys = add_disorder(sys, lat, p['Nimp'], p['V'], p['dis'])
+    sys = add_disorder(sys, lat, p['Nimp'], p['V'], p['dis'])
     
     #Add Leads
     if (p['leads']):
