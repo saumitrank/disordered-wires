@@ -1,18 +1,22 @@
 import kwant
 import numpy as np
 
-def add_disorder(sys:kwant.builder.Builder, lat, Nimp:float=1.0, V:float=0.0, dis:int=0)->kwant.system.FiniteSystem:
+
+
+
+
+def add_disorder(sys:kwant.builder.Builder, lat, Nimp:float=1.0, V:float=0.0, dis:int=0)->kwant.builder.Builder:
     """Add on-site or NN hopping disorder to a system
 
     Args:
-        sys (kwant.builder.Builder): _description_
-        lat (_type_): _description_
-        Nimp (float, optional): _description_. Defaults to 1.0.
-        V (float, optional): _description_. Defaults to 0.0.
-        dis (int, optional): _description_. Defaults to 0.
+        sys (kwant.builder.Builder): A KWANT Builder to which we add disorder
+        lat (kwant.lattice.Monoatomic or kwant.lattice.Polyatomic): A lattice in KWANT
+        Nimp (float, optional): Probability of having disorder on a site/bond. Defaults to 1.0.
+        V (float, optional): Disorder strength. Disorder is chosen uniformly from [-1, 1]. Defaults to 0.0.
+        dis (int, optional): Disorder type. 0 for on-site and 1 for hopping. Defaults to 0.
 
     Returns:
-        kwant.system.FiniteSystem: _description_
+        kwant.builder.Builder: _description_
     """
     #Get number of orbitals
     norbs = list(sys.sites())[0].family.norbs
@@ -38,6 +42,8 @@ def add_disorder(sys:kwant.builder.Builder, lat, Nimp:float=1.0, V:float=0.0, di
 
 
 
+
+
 def zigzag(params:dict)->kwant.system.FiniteSystem:
     """Create a zigzag ribbon with no spin and only NN hopping
 
@@ -51,7 +57,7 @@ def zigzag(params:dict)->kwant.system.FiniteSystem:
         L (int): Length
         W (int): Number of horizontal chains
         Nimp (float): Probability of bond/site having disorder (from 0 to 1)
-        V (float): Strength of disorder chosen from uniform dsbn in [-V, V]
+        V (float): Strength of disorder chosen from uniform distribution in [-V, V]
         dis (0, 1): Disorder type. 0 for on-site, 1 for hopping
         leads (bool): Whether or not there should be leads
 
@@ -61,7 +67,7 @@ def zigzag(params:dict)->kwant.system.FiniteSystem:
     
     #Default values of parameters
     p = {'a' : 1.0, 't' : 1.0, 'mu' : 0.0, 'mul' : 0.0,
-         'L' : 10, 'W' : 10, 'Nimp' : 1.0, 'V' : 0.0, 'dis' : 0, 'leads':True}
+         'W' : 10, 'W' : 10, 'Nimp' : 1.0, 'V' : 0.0, 'dis' : 0, 'leads':True}
     
     #Update values
     p.update(params)
@@ -115,5 +121,83 @@ def zigzag(params:dict)->kwant.system.FiniteSystem:
         #Attach leads
         sys.attach_lead(lead_left)
         sys.attach_lead(lead_right)
+    
+    return sys.finalized()
+
+
+
+
+
+def armchair(params:dict)->kwant.system.FiniteSystem:
+    """Create arm-chair ribbon with no spin an NN hopping
+
+    Args:
+        params (dict): A dictionary of parameters for the arm-chair ribbon. 
+        This contains:
+        a (float): Lattice constant 
+        t (float): NN hopping
+        mu (float): Chemical potential in scattering region
+        mul (float): Additional potential in leads
+        L (int): Length
+        W (int): Number of chains
+        Nimp (float): Probability of bond/site having disorder (from 0 to 1)
+        V (float): Strength of disorder chosen from uniform distribution in [-V, V]
+        dis (0, 1): Disorder type. 0 for on-site, 1 for hopping
+        leads (bool): Whether or not there should be leads
+
+    Returns:
+        kwant.system.FiniteSystem: Arm-chair ribbon with / without leads attached
+    """
+    #Default values of params
+    p = {'a' : 1.0, 't' : 1.0, 'mu' : 0.0, 'mul' : 0.0, 
+         'L' : 10, 'W' : 10, 'Nimp' : 1.0, 'V' : 0.0, 'dis' : 0, 'leads':True}
+  
+    #Update params
+    p.update(params)
+
+    #Define lattice and system
+    lat = kwant.lattice.honeycomb(p['a'], norbs=1)
+    B, A = lat.sublattices
+    sys = kwant.Builder()
+    
+    #Create sites with chemical potential and add NN hopping
+    for i in range(p['L']):
+        for j in range(p['W']//2):
+            sys[A(j-i//2, i)] = p['mu']
+            sys[B(j-i//2, i)] = p['mu']
+        if (p['W']%2 != 0) and (i%2 == 0):
+            sys[A(j+1 - i//2, i)] = p['mu']
+            sys[B(j+1 - i//2, i)] = p['mu']
+
+    sys[lat.neighbors()] = p['t']
+    sys.eradicate_dangling()
+    
+    #Add Disorder
+    sys = add_disorder(sys, lat, p['Nimp'], p['V'], p['dis'])
+    
+    #Add Leads
+    if(p['leads']):
+        #Create top lead
+        sym_top = kwant.TranslationalSymmetry(lat.vec((-1, 2)))
+        lead_top = kwant.Builder(sym_top)
+        
+        for i in range(p['W']//2):
+            lead_top[A(i, 0)] = (p['mu'] + p['mul'])
+            lead_top[B(i, 0)] = (p['mu'] + p['mul'])
+            lead_top[A(i, 1)] = (p['mu'] + p['mul'])
+            lead_top[B(i, 1)] = (p['mu'] + p['mul'])
+        if (p['W']%2 != 0):
+            lead_top[A(i+1, 0)] = (p['mu'] + p['mul'])
+            lead_top[B(i+1, 0)] = (p['mu'] + p['mul'])
+                    
+            lead_top[lat.neighbors()] = p['t']
+            lead_top.eradicate_dangling()
+            
+            #Bottom lead is reveresed top lead
+            lead_bot = lead_top.reversed()
+            
+            #Attach lead
+            sys.attach_lead(lead_top)
+            sys.attach_lead(lead_bot)
     
     return sys.finalized()
