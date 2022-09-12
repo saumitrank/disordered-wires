@@ -1,7 +1,8 @@
 import kwant
 import numpy as np
 
-
+"""This module contains functions to create various zigzag and armchair graphene ribbons with disorder
+"""
 
 
 
@@ -309,3 +310,83 @@ def kane_mele(params:dict)->kwant.system.FiniteSystem:
         sys.attach_lead(lead_right)
 
     return sys.finalized()
+
+
+
+
+def zigzag_lead(params:dict)->kwant.system.InfiniteSystem:
+    """Creates a right-facing zizgag nanoribbon lead
+
+    Args:
+        params (dict): A dictionary of parameters for the zigzag ribbon. 
+        This contains:
+        a (float): Lattice constant 
+        t (float): NN hopping
+        W (int): Number of horizontal chains
+
+    Returns:
+        kwant.system.InfiniteSystem: Finalized zigzag lead
+    """
+
+    #Default values
+    p = {'a' : 1.0, 't' : 1.0, 'mu' : 0.0, 'W' : 10}
+    
+    #Update params
+    p.update(params)
+
+    #Create H and V for clean system
+    lat = kwant.lattice.honeycomb(p['a'], norbs=1)
+    B, A = lat.sublattices
+
+    sym = kwant.TranslationalSymmetry(lat.vec((1, 0))) # A right facing lead
+    lead = kwant.Builder(sym)
+    for j in range(p['W']+1):
+        lead[A(0, j)] = (p['mu'])
+        lead[B(0, j)] = (p['mu'])
+
+    lead[lat.neighbors()] = p['t']
+    lead.eradicate_dangling()
+    
+    return lead.finalized()
+
+
+
+
+def armchair_lead(params:dict)->kwant.system.InfiniteSystem:
+    """Creates a top-facing armchair nanoribbon lead
+
+    Args:
+        params (dict): A dictionary of parameters for the zigzag ribbon. 
+        This contains:
+        a (float): Lattice constant 
+        t (float): NN hopping
+        W (int): Number of horizontal chains
+
+    Returns:
+        kwant.system.InfiniteSystem: Finalized armchair lead
+    """
+
+    #Default values
+    p = {'a' : 1.0, 't' : 1.0, 'mu' : 0.0, 'W' : 10}
+    
+    #Update params
+    p.update(params)
+
+    #Create H and V for clean system
+    lat = kwant.lattice.honeycomb(p['a'], norbs=1)
+    B, A = lat.sublattices
+
+    sym = kwant.TranslationalSymmetry(lat.vec((-1, 2))) # A top facing lead
+    lead = kwant.Builder(sym)
+    for i in range((p['W']+1)//2):
+        lead[A(i, 0)] = (p['mu'])
+        lead[B(i, 0)] = (p['mu'])
+        if i != (p['W']//2):
+            lead[A(i, 1)] = (p['mu'])
+            lead[B(i, 1)] = (p['mu'])
+
+
+    lead[lat.neighbors()] = p['t']
+    lead.eradicate_dangling()
+    
+    return lead.finalized()
