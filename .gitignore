@@ -1,5 +1,4 @@
-
-.vscode/settings.json
-src/__pycache__/systems.cpython-38.pyc
+.vscode
+src/__pycache__
 src/test_notebook.ipynb
 *.pyc
