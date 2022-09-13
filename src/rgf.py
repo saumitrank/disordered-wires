@@ -265,7 +265,7 @@ class rgf():
         Nimp (float): Probability of bond/site having disorder (from 0 to 1)
         V (float): Strength of disorder chosen from uniform distribution in [-V, V]
         dis (0, 1): Disorder type. 0 for on-site, 1 for hopping
-        gamma_ratio (float): Ratio of imaginary part of energy to real part
+        gamma_ratio (float): Ratio of real part of energy to imaginary part
         leads (bool): Whether or not the lead self-energy is included
 
         Returns:
