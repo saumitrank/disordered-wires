@@ -17,7 +17,7 @@ def add_disorder(sys:kwant.builder.Builder, lat, Nimp:float=1.0, V:float=0.0, di
         dis (int, optional): Disorder type. 0 for on-site and 1 for hopping. Defaults to 0.
 
     Returns:
-        kwant.builder.Builder: _description_
+        kwant.builder.Builder: Builder with disorder added
     """
     #Get number of orbitals
     norbs = list(sys.sites())[0].family.norbs
