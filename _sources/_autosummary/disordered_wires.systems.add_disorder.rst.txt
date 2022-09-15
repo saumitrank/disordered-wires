@@ -1,0 +1,6 @@
+disordered\_wires.systems.add\_disorder
+=======================================
+
+.. currentmodule:: disordered_wires.systems
+
+.. autofunction:: add_disorder

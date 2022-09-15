@@ -12,6 +12,8 @@ disordered\_wires.systems
    .. rubric:: Functions
 
    .. autosummary::
+      :toctree:
+      :nosignatures:
    
       add_disorder
       armchair

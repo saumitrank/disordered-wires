@@ -1,0 +1,6 @@
+disordered\_wires.systems.zigzag\_lead
+======================================
+
+.. currentmodule:: disordered_wires.systems
+
+.. autofunction:: zigzag_lead

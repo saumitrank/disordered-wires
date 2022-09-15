@@ -1,0 +1,6 @@
+disordered\_wires.systems.armchair
+==================================
+
+.. currentmodule:: disordered_wires.systems
+
+.. autofunction:: armchair

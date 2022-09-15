@@ -1,0 +1,497 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>disordered_wires.systems &#8212; disordered_wires 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for disordered_wires.systems</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains functions to create various zigzag and armchair graphene ribbons with disorder</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">kwant</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+
+
+
+<div class="viewcode-block" id="add_disorder"><a class="viewcode-back" href="../../_autosummary/disordered_wires.systems.add_disorder.html#disordered_wires.systems.add_disorder">[docs]</a><span class="k">def</span> <span class="nf">add_disorder</span><span class="p">(</span><span class="n">sys</span><span class="p">:</span><span class="n">kwant</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">Builder</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">Nimp</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">V</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dis</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">kwant</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">Builder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Add on-site or NN hopping disorder to a system</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sys (kwant.builder.Builder): A KWANT Builder to which we add disorder</span>
+<span class="sd">        lat (kwant.lattice.Monoatomic or kwant.lattice.Polyatomic): A lattice in KWANT</span>
+<span class="sd">        Nimp (float, optional): Probability of having disorder on a site/bond. Defaults to 1.0.</span>
+<span class="sd">        V (float, optional): Disorder strength. Disorder is chosen uniformly from [-1, 1]. Defaults to 0.0.</span>
+<span class="sd">        dis (int, optional): Disorder type. 0 for on-site and 1 for hopping. Defaults to 0.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        kwant.builder.Builder: Builder with disorder added</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Get number of orbitals</span>
+    <span class="n">norbs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">sites</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">norbs</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">norbs</span><span class="p">)</span>
+    
+    <span class="c1">#On-site disorder</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">site</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">sites</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">Nimp</span><span class="p">):</span>
+                <span class="n">Vx</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">V</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">-</span> <span class="n">V</span>
+                <span class="n">sys</span><span class="p">[</span><span class="n">site</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="p">[</span><span class="n">site</span><span class="p">]</span> <span class="o">+</span> <span class="n">Vx</span><span class="o">*</span><span class="n">m</span>
+
+    <span class="c1">#NN Hopping disorder</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">dis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">hopping_kind</span> <span class="ow">in</span> <span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">():</span>
+            <span class="n">pairs</span> <span class="o">=</span> <span class="n">hopping_kind</span><span class="p">(</span><span class="n">sys</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">hop</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">Nimp</span><span class="p">):</span>
+                    <span class="n">Vx</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">V</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">-</span> <span class="n">V</span>
+                    <span class="n">sys</span><span class="p">[</span><span class="n">hop</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="p">[</span><span class="n">hop</span><span class="p">]</span> <span class="o">+</span> <span class="n">Vx</span><span class="o">*</span><span class="n">m</span> <span class="c1">#Builder automatically takes care of hermitian conjugate</span>
+    
+    <span class="k">return</span> <span class="n">sys</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="zigzag"><a class="viewcode-back" href="../../_autosummary/disordered_wires.systems.zigzag.html#disordered_wires.systems.zigzag">[docs]</a><span class="k">def</span> <span class="nf">zigzag</span><span class="p">(</span><span class="n">params</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">kwant</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">FiniteSystem</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Create a zigzag ribbon with no spin and only NN hopping</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        params (dict): A dictionary of parameters for the zigzag ribbon. </span>
+<span class="sd">        This contains:</span>
+<span class="sd">        a (float): Lattice constant </span>
+<span class="sd">        t (float): NN hopping</span>
+<span class="sd">        mu (float): Chemical potential in scattering region</span>
+<span class="sd">        mul (float): Additional potential in leads</span>
+<span class="sd">        L (int): Length</span>
+<span class="sd">        W (int): Number of horizontal chains</span>
+<span class="sd">        Nimp (float): Probability of bond/site having disorder (from 0 to 1)</span>
+<span class="sd">        V (float): Strength of disorder chosen from uniform distribution in [-V, V]</span>
+<span class="sd">        dis (0, 1): Disorder type. 0 for on-site, 1 for hopping</span>
+<span class="sd">        leads (bool): Whether or not there should be leads</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        kwant.system.FiniteSystem: Zigzag graphene ribbon with/without leads attached</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1">#Default values of parameters</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;mul&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+         <span class="s1">&#39;W&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;W&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;Nimp&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;dis&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;leads&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">}</span>
+    
+    <span class="c1">#Update values</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    
+    <span class="c1">#Create lattice and builder</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">honeycomb</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">norbs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">B</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">sublattices</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">Builder</span><span class="p">()</span>
+    
+    <span class="c1">#Special case: 1D chain</span>
+    <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]):</span>
+            <span class="n">sys</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+            <span class="n">sys</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+
+        <span class="n">sys</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+    
+    <span class="c1">#For width larger than 1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">sys</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+                <span class="n">sys</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">j</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">sys</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">j</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+                    <span class="n">sys</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">j</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+            
+
+        <span class="n">sys</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">eradicate_dangling</span><span class="p">()</span>
+        
+    <span class="c1">#Add disorder</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">add_disorder</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Nimp&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;dis&#39;</span><span class="p">])</span>
+    
+    <span class="c1">#Add Leads</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;leads&#39;</span><span class="p">]):</span>
+        <span class="c1">#Create left lead</span>
+        <span class="n">sym_left</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">TranslationalSymmetry</span><span class="p">(</span><span class="n">lat</span><span class="o">.</span><span class="n">vec</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="n">lead_left</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">Builder</span><span class="p">(</span><span class="n">sym_left</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">lead_left</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span>
+                <span class="n">lead_left</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span>
+        
+        <span class="n">lead_left</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+        <span class="n">lead_left</span><span class="o">.</span><span class="n">eradicate_dangling</span><span class="p">()</span>
+        
+        <span class="c1">#Right lead is reversed version of left</span>
+        <span class="n">lead_right</span> <span class="o">=</span> <span class="n">lead_left</span><span class="o">.</span><span class="n">reversed</span><span class="p">()</span>
+        
+        <span class="c1">#Attach leads</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">attach_lead</span><span class="p">(</span><span class="n">lead_left</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">attach_lead</span><span class="p">(</span><span class="n">lead_right</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">finalized</span><span class="p">()</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="armchair"><a class="viewcode-back" href="../../_autosummary/disordered_wires.systems.armchair.html#disordered_wires.systems.armchair">[docs]</a><span class="k">def</span> <span class="nf">armchair</span><span class="p">(</span><span class="n">params</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">kwant</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">FiniteSystem</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Create arm-chair ribbon with no spin an NN hopping</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        params (dict): A dictionary of parameters for the arm-chair ribbon. </span>
+<span class="sd">        This contains:</span>
+<span class="sd">        a (float): Lattice constant </span>
+<span class="sd">        t (float): NN hopping</span>
+<span class="sd">        mu (float): Chemical potential in scattering region</span>
+<span class="sd">        mul (float): Additional potential in leads</span>
+<span class="sd">        L (int): Length</span>
+<span class="sd">        W (int): Number of chains</span>
+<span class="sd">        Nimp (float): Probability of bond/site having disorder (from 0 to 1)</span>
+<span class="sd">        V (float): Strength of disorder chosen from uniform distribution in [-V, V]</span>
+<span class="sd">        dis (0, 1): Disorder type. 0 for on-site, 1 for hopping</span>
+<span class="sd">        leads (bool): Whether or not there should be leads</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        kwant.system.FiniteSystem: Arm-chair ribbon with / without leads attached</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Default values of params</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;mul&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> 
+         <span class="s1">&#39;L&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;W&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;Nimp&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;dis&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;leads&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">}</span>
+  
+    <span class="c1">#Update params</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1">#Define lattice and system</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">honeycomb</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">norbs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">B</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">sublattices</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">Builder</span><span class="p">()</span>
+    
+    <span class="c1">#Create sites with chemical potential and add NN hopping</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">sys</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">j</span><span class="o">-</span><span class="n">i</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+            <span class="n">sys</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">j</span><span class="o">-</span><span class="n">i</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">sys</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+            <span class="n">sys</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+
+    <span class="n">sys</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">eradicate_dangling</span><span class="p">()</span>
+    
+    <span class="c1">#Add Disorder</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">add_disorder</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Nimp&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;dis&#39;</span><span class="p">])</span>
+    
+    <span class="c1">#Add Leads</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;leads&#39;</span><span class="p">]):</span>
+        <span class="c1">#Create top lead</span>
+        <span class="n">sym_top</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">TranslationalSymmetry</span><span class="p">(</span><span class="n">lat</span><span class="o">.</span><span class="n">vec</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+        <span class="n">lead_top</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">Builder</span><span class="p">(</span><span class="n">sym_top</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">lead_top</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span>
+            <span class="n">lead_top</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span>
+            <span class="n">lead_top</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span>
+            <span class="n">lead_top</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">lead_top</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span>
+            <span class="n">lead_top</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span>
+                    
+            <span class="n">lead_top</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+            <span class="n">lead_top</span><span class="o">.</span><span class="n">eradicate_dangling</span><span class="p">()</span>
+            
+            <span class="c1">#Bottom lead is reveresed top lead</span>
+            <span class="n">lead_bot</span> <span class="o">=</span> <span class="n">lead_top</span><span class="o">.</span><span class="n">reversed</span><span class="p">()</span>
+            
+            <span class="c1">#Attach lead</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">attach_lead</span><span class="p">(</span><span class="n">lead_top</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">attach_lead</span><span class="p">(</span><span class="n">lead_bot</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">finalized</span><span class="p">()</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="kane_mele"><a class="viewcode-back" href="../../_autosummary/disordered_wires.systems.kane_mele.html#disordered_wires.systems.kane_mele">[docs]</a><span class="k">def</span> <span class="nf">kane_mele</span><span class="p">(</span><span class="n">params</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">kwant</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">FiniteSystem</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Create a zigzag Kane-Mele ribbon with NN and SOC</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        params (dict): A dictionary of parameters for the Kane-Mele ribbon. </span>
+<span class="sd">        This contains:</span>
+<span class="sd">        a (float): Lattice constant </span>
+<span class="sd">        t (float): NN hopping</span>
+<span class="sd">        t2 (float): NNN SOC</span>
+<span class="sd">        mu (float): Chemical potential in scattering region</span>
+<span class="sd">        mul (float): Additional potential in leads</span>
+<span class="sd">        L (int): Length</span>
+<span class="sd">        W (int): Number of chains</span>
+<span class="sd">        Nimp (float): Probability of bond/site having disorder (from 0 to 1)</span>
+<span class="sd">        V (float): Strength of disorder chosen from uniform distribution in [-V, V]</span>
+<span class="sd">        dis (0, 1): Disorder type. 0 for on-site, 1 for hopping</span>
+<span class="sd">        leads (bool): Whether or not there should be leads</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        kwant.system.FiniteSystem: Arm-chair ribbon with / without leads attached</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1">#Default values</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;t2&#39;</span> <span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;t3&#39;</span> <span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;mul&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> 
+         <span class="s1">&#39;L&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;W&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;Nimp&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;dis&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+         <span class="s1">&#39;leads&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">}</span>
+    
+    <span class="c1">#Update params</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>  
+    
+    <span class="c1">#Define Pauli matrices</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+                      <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                      <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                      <span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))))</span>
+    
+    <span class="c1">#Define lattice and sub-lattices with spin</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">honeycomb</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">norbs</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">B</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">sublattices</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">Builder</span><span class="p">()</span>
+    
+    <span class="c1">#Create sites and NN hopping</span>
+    <span class="c1">#Special case: 1D chain</span>
+    <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]):</span>
+            <span class="n">sys</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">sys</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">sys</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1">#For W&gt;1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">sys</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">sys</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">j</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">sys</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">j</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">sys</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">j</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">sys</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">eradicate_dangling</span><span class="p">()</span>    
+    
+    <span class="c1">#Add disorder</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">add_disorder</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Nimp&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;dis&#39;</span><span class="p">])</span>
+    
+    <span class="c1">#NNN spin orbit term</span>
+    <span class="n">kinds</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+    
+    <span class="n">nuA</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1">#Spin orbit sign for A to A</span>
+    
+    <span class="k">for</span> <span class="n">kind</span><span class="p">,</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">kinds</span><span class="p">,</span> <span class="n">nuA</span><span class="p">):</span>
+        <span class="n">sys</span><span class="p">[</span><span class="n">kwant</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">HoppingKind</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">A</span><span class="p">)]</span> <span class="o">=</span>  <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;t2&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">sys</span><span class="p">[</span><span class="n">kwant</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">HoppingKind</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">B</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;t2&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+      
+    <span class="c1">#Add Leads</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;leads&#39;</span><span class="p">]):</span>
+        <span class="c1">#Create left leads</span>
+        <span class="n">sym_left</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">TranslationalSymmetry</span><span class="p">(</span><span class="n">lat</span><span class="o">.</span><span class="n">vec</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="n">lead_left</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">Builder</span><span class="p">(</span><span class="n">sym_left</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">lead_left</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">lead_left</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;mul&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">lead_left</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lead_left</span><span class="o">.</span><span class="n">eradicate_dangling</span><span class="p">()</span>
+
+        <span class="c1">#NNN spin orbit term</span>
+        <span class="n">kinds</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">nuA</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1">#Spin orbit sign for A to A</span>
+        
+        <span class="k">for</span> <span class="n">kind</span><span class="p">,</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">kinds</span><span class="p">,</span> <span class="n">nuA</span><span class="p">):</span>
+            <span class="n">lead_left</span><span class="p">[</span><span class="n">kwant</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">HoppingKind</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">A</span><span class="p">)]</span> <span class="o">=</span>  <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;t2&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">lead_left</span><span class="p">[</span><span class="n">kwant</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">HoppingKind</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">B</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;t2&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">sigma</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        
+        <span class="n">lead_right</span> <span class="o">=</span> <span class="n">lead_left</span><span class="o">.</span><span class="n">reversed</span><span class="p">()</span>
+        
+        <span class="c1">#Attach leads</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">attach_lead</span><span class="p">(</span><span class="n">lead_left</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">attach_lead</span><span class="p">(</span><span class="n">lead_right</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">finalized</span><span class="p">()</span></div>
+
+
+
+
+<div class="viewcode-block" id="zigzag_lead"><a class="viewcode-back" href="../../_autosummary/disordered_wires.systems.zigzag_lead.html#disordered_wires.systems.zigzag_lead">[docs]</a><span class="k">def</span> <span class="nf">zigzag_lead</span><span class="p">(</span><span class="n">params</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">kwant</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">InfiniteSystem</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Creates a right-facing zizgag nanoribbon lead</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        params (dict): A dictionary of parameters for the zigzag ribbon. </span>
+<span class="sd">        This contains:</span>
+<span class="sd">        a (float): Lattice constant </span>
+<span class="sd">        t (float): NN hopping</span>
+<span class="sd">        W (int): Number of horizontal chains</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        kwant.system.InfiniteSystem: Finalized zigzag lead</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#Default values</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;W&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+    
+    <span class="c1">#Update params</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1">#Create H and V for clean system</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">honeycomb</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">norbs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">B</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">sublattices</span>
+
+    <span class="n">sym</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">TranslationalSymmetry</span><span class="p">(</span><span class="n">lat</span><span class="o">.</span><span class="n">vec</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span> <span class="c1"># A right facing lead</span>
+    <span class="n">lead</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">Builder</span><span class="p">(</span><span class="n">sym</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">lead</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">])</span>
+        <span class="n">lead</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">])</span>
+
+    <span class="n">lead</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+    <span class="n">lead</span><span class="o">.</span><span class="n">eradicate_dangling</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">lead</span><span class="o">.</span><span class="n">finalized</span><span class="p">()</span></div>
+
+
+
+
+<div class="viewcode-block" id="armchair_lead"><a class="viewcode-back" href="../../_autosummary/disordered_wires.systems.armchair_lead.html#disordered_wires.systems.armchair_lead">[docs]</a><span class="k">def</span> <span class="nf">armchair_lead</span><span class="p">(</span><span class="n">params</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">kwant</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">InfiniteSystem</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Creates a top-facing armchair nanoribbon lead</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        params (dict): A dictionary of parameters for the zigzag ribbon. </span>
+<span class="sd">        This contains:</span>
+<span class="sd">        a (float): Lattice constant </span>
+<span class="sd">        t (float): NN hopping</span>
+<span class="sd">        W (int): Number of horizontal chains</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        kwant.system.InfiniteSystem: Finalized armchair lead</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#Default values</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;W&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+    
+    <span class="c1">#Update params</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1">#Create H and V for clean system</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">honeycomb</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">norbs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">B</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">sublattices</span>
+
+    <span class="n">sym</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">TranslationalSymmetry</span><span class="p">(</span><span class="n">lat</span><span class="o">.</span><span class="n">vec</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span> <span class="c1"># A top facing lead</span>
+    <span class="n">lead</span> <span class="o">=</span> <span class="n">kwant</span><span class="o">.</span><span class="n">Builder</span><span class="p">(</span><span class="n">sym</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">lead</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">])</span>
+        <span class="n">lead</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">lead</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">])</span>
+            <span class="n">lead</span><span class="p">[</span><span class="n">B</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">])</span>
+
+
+    <span class="n">lead</span><span class="p">[</span><span class="n">lat</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+    <span class="n">lead</span><span class="o">.</span><span class="n">eradicate_dangling</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">lead</span><span class="o">.</span><span class="n">finalized</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">disordered_wires</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/disordered_wires.html">disordered_wires</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Saumitran.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

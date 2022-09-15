@@ -1,0 +1,6 @@
+disordered\_wires.systems.kane\_mele
+====================================
+
+.. currentmodule:: disordered_wires.systems
+
+.. autofunction:: kane_mele

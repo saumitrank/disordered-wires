@@ -1,0 +1,6 @@
+disordered\_wires.systems.zigzag
+================================
+
+.. currentmodule:: disordered_wires.systems
+
+.. autofunction:: zigzag
