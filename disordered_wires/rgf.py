@@ -1,5 +1,5 @@
 """
-Module the class to perform RGF calculations
+This module contains the class to perform RGF calculations
 """
 
 
