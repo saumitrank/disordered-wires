@@ -3,3 +3,4 @@ src/__pycache__
 src/test_notebook.ipynb
 *.pyc
 docs/build
+venv
