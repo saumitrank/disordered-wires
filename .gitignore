@@ -1,7 +1,4 @@
 .vscode
-disordered_wires/__pycache__
-disordered_wires/test_notebook.ipynb
-*.pyc
-docs/build
+*__pycache__
 venv
-docs/_build
+disordered_wires/test_notebook.ipynb
