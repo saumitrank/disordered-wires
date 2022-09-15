@@ -1,6 +1,7 @@
 .vscode
-src/__pycache__
-src/test_notebook.ipynb
+disordered_wires/__pycache__
+disordered_wires/test_notebook.ipynb
 *.pyc
 docs/build
 venv
+docs/_build
