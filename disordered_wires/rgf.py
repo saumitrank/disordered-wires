@@ -1,3 +1,10 @@
+"""
+Module the class to perform RGF calculations
+"""
+
+
+
+
 import kwant
 import numpy as np
 import math

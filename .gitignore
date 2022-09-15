@@ -3,3 +3,4 @@
 venv
 disordered_wires/test_notebook.ipynb
 docs/build
+docs/source/_autosummary

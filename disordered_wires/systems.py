@@ -1,8 +1,12 @@
+"""
+This module contains functions to create various zigzag and armchair graphene ribbons with disorder
+"""
+
+
 import kwant
 import numpy as np
 
-"""This module contains functions to create various zigzag and armchair graphene ribbons with disorder
-"""
+
 
 
 

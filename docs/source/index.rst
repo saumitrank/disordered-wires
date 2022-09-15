@@ -6,15 +6,15 @@
 Welcome to disordered_wires's documentation!
 ============================================
 
+This project contains code to generate disordered graphene nanoribbons and calculate properties such as the spectrum and conductance. 
+This is done primarily using the package KWANT for Python. 
+There is also a class that allows one to perform calculations of properties using the Recursive Green’s Function (RGF) technique for a more general system.
+
+
+Contents
+========
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   api
