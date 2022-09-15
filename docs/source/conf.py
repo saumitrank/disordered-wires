@@ -53,7 +53,7 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 #Mock imports
-autodoc_mock_imports = ['kwant']
+autodoc_mock_imports = ['kwant', 'numpy']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
