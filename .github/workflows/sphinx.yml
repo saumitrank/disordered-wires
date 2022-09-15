@@ -13,7 +13,9 @@ jobs:
         pip install -r requirements.txt
         cd ..
     - name: Build HTML
-      uses: ammaraskar/sphinx-action@master
+      run: |
+        cd docs
+        make html
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -21,7 +23,7 @@ jobs:
         path: docs/build/html/
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: docs/build/html
