@@ -1,0 +1,33 @@
+﻿disordered\_wires
+=================
+
+.. automodule:: disordered_wires
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   disordered_wires.rgf
+   disordered_wires.systems
+   disordered_wires.utils
+

@@ -1,0 +1,34 @@
+disordered\_wires.systems
+=========================
+
+.. automodule:: disordered_wires.systems
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      add_disorder
+      armchair
+      armchair_lead
+      kane_mele
+      zigzag
+      zigzag_lead
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
