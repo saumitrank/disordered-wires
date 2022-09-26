@@ -23,7 +23,7 @@ The "phase diagram" of transport distributions is shown here:
 
 ![phase diagram](/images/phase-diagram.pdf)
 
-[phase_diagram.pdf](https://github.com/saumitrank/disordered-wires/files/9650135/phase_diagram.pdf)
+![phase_diagram.pdf](https://github.com/saumitrank/disordered-wires/files/9650135/phase_diagram.pdf)
 
 
 
