@@ -1,0 +1,6 @@
+disordered\_wires.utils.plot\_band\_structure
+=============================================
+
+.. currentmodule:: disordered_wires.utils
+
+.. autofunction:: plot_band_structure

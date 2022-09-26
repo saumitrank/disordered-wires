@@ -9,6 +9,14 @@ disordered\_wires.utils
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      plot_band_structure
+   
    
 
    
