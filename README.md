@@ -23,4 +23,8 @@ The "phase diagram" of transport distributions is shown here:
 
 ![phase diagram](/images/phase-diagram.pdf)
 
+[phase_diagram.pdf](https://github.com/saumitrank/disordered-wires/files/9650135/phase_diagram.pdf)
+
+
+
 * In the [second paper](https://doi.org/10.48550/arXiv.2208.05529), the transport distributions near the critical point found previously were used to show the existence of a topological multi-critical point in zigzag graphene. 
