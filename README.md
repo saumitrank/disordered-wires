@@ -20,6 +20,7 @@ The density of states and transport data generated using this code has resulted 
 This is in contrast to the usual one-parameter scaling found in the traditional Fokker-Planck approach. 
 The dataset for this work can be [found here](https://hdl.handle.net/11299/229873). 
 The "phase diagram" of transport distributions is shown here:
+
 ![phase diagram](/images/phase-diagram.pdf)
 
 * In the [second paper](https://doi.org/10.48550/arXiv.2208.05529), the transport distributions near the critical point found previously were used to show the existence of a topological multi-critical point in zigzag graphene. 
