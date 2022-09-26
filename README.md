@@ -16,15 +16,25 @@ The documentation for this code can be found in the [github-pages site](https://
 ## Results
 
 The density of states and transport data generated using this code has resulted in two publications so far:
-* In the [first paper](https://doi.org/10.48550/arXiv.2112.09748), it was shown that the transport distributions near the topological phase transition of the SSH chain obey a two-parameter scaling paradigm. 
+
+### Two-parameter scaling
+
+In the [first paper](https://doi.org/10.48550/arXiv.2112.09748), it was shown that the transport distributions near the topological phase transition of the SSH chain obey a two-parameter scaling paradigm. 
 This is in contrast to the usual one-parameter scaling found in the traditional Fokker-Planck approach. 
 The dataset for this work can be [found here](https://hdl.handle.net/11299/229873). 
-The "phase diagram" of transport distributions is shown here:
+This is the "phase diagram" summarizing the transport regimes:
+<p align="center">
+  <img alt="Phase Diagram" src="/images/phase-diagram.jpg" width="400" height="300">
+</p>
 
-![phase diagram](/images/phase-diagram.pdf)
+### Multi-criticality in zigzag graphene
 
-![phase_diagram.pdf](https://github.com/saumitrank/disordered-wires/files/9650135/phase_diagram.pdf)
-
-
-
-* In the [second paper](https://doi.org/10.48550/arXiv.2208.05529), the transport distributions near the critical point found previously were used to show the existence of a topological multi-critical point in zigzag graphene. 
+In the [second paper](https://doi.org/10.48550/arXiv.2208.05529), the transport distributions near the critical point found previously were used to show the existence of a topological multi-critical point in zigzag graphene. 
+Here is the dispersion of zigzag graphene, highlighting the edge states and flat dispersion of the lowest sub-band:
+<p align="center">
+  <img alt="Phase Diagram" src="/images/zigzag-dispersion.jpg" width="400" height="300">
+</p>
+And here is a phase diagram illustrating the existence of multiple topological phases as the hopping parameters are tuned, with graphene tuned to the multi-critical point in the middle:
+<p align="center">
+  <img alt="Phase Diagram" src="/images/phase-diagram-zigzag.jpg" width="400" height="300">
+</p>
