@@ -1,4 +1,9 @@
+![License Badge](https://img.shields.io/github/license/saumitrank/disordered-wires?style=plastic)
+![Docs](https://img.shields.io/website?down_message=offline&label=docs&up_message=online&url=https%3A%2F%2Fsaumitrank.github.io%2Fdisordered-wires%2F)
+
 # Disordered Wires
+
+[Github pages site with documentation](https://saumitrank.github.io/disordered-wires/)
 
 ## Overview
 
@@ -10,7 +15,7 @@ There is also an implementation of the Recursive Green's Function (RGF) techniqu
 
 The main requirement is the [KWANT](https://kwant-project.org/) package, which can be installed by following the instructions on its site. Apart from this the usual scientific libraries such as numpy, scipy, and matplotlib are required. 
 
-The documentation for this code can be found in the [github-pages site](https://saumitrank.github.io/disordered-wires/) for the repo.
+The documentation can be found in the [Github pages site](https://saumitrank.github.io/disordered-wires/) for the repo.
 
 
 ## Results
